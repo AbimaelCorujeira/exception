@@ -1,6 +1,7 @@
 package application;
 
 import model.entities.Reserva;
+import model.exceptions.DomainException;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -8,21 +9,18 @@ import java.util.Date;
 import java.util.Scanner;
 
 public class Program {
-    public static void main(String[] args) throws ParseException {
+    public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);
         SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
 
-        System.out.print("Número do quarto: ");
-        int numero = sc.nextInt();
-        System.out.print("Data de check-in (dd/mm/yyyy): ");
-        Date checkIn = sdf.parse(sc.next());
-        System.out.print("Data de check-out (dd/mm/yyyy): ");
-        Date checkOut = sdf.parse(sc.next());
+        try {
+            System.out.print("Número do quarto: ");
+            int numero = sc.nextInt();
+            System.out.print("Data de check-in (dd/mm/yyyy): ");
+            Date checkIn = sdf.parse(sc.next());
+            System.out.print("Data de check-out (dd/mm/yyyy): ");
+            Date checkOut = sdf.parse(sc.next());
 
-        if(!checkOut.after(checkIn)) {
-            System.out.println("Erro na reserva: A data de check-out deve " +
-                    "ser posterior à data de check-in");
-        } else {
             Reserva reserva = new Reserva(numero, checkIn, checkOut);
             System.out.println("Reserva: " + reserva);
 
@@ -33,18 +31,14 @@ public class Program {
             System.out.print("Data de check-out (dd/mm/yyyy): ");
             checkOut = sdf.parse(sc.next());
 
-            Date agora = new Date();
-            if(checkIn.before(agora) || checkOut.before(agora)) {
-                System.out.println("Erro na reserva: As datas da reserva para atualização devem ser datas futuras");
-            } else {
-                if(!checkOut.after(checkIn)) {
-                    System.out.println("Erro na reserva: A data de check-out deve " +
-                            "ser posterior à data de check-in");
-                } else {
-                    reserva.atualizarData(checkIn, checkOut);
-                    System.out.println("Reserva: " + reserva);
-                }
-            }
+            reserva.atualizarData(checkIn, checkOut);
+            System.out.println("Reserva: " + reserva);
+        } catch (ParseException e) {
+            System.out.println("Formato de data inválido!");
+        } catch (DomainException e) {
+            System.out.println("Erro na reserva: " + e.getMessage());
+        } catch (RuntimeException e) {
+            System.out.println("Erro inesperado!");
         }
         sc.close();
     }
